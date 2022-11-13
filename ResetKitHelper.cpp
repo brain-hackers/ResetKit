@@ -26,8 +26,12 @@
  *
  */
 
-#include <windows.h>
+#include <fstream>
+#include <regex>
 #include <stdint.h>
+#include <stdlib.h>
+#include <windows.h>
+#include "models.h"
 
 #define FSNOTIFY_POWER_OFF      1
 #define FSNOTIFY_POWER_ON       0
@@ -496,23 +500,42 @@ static void EDNA2_whiteoutScreen(){
 	whiteoutBitmap(fb, 480*320);
 }*/
 
-#pragma mark - Main
-
 static int deviceGeneration(){
-    static int cache=0;
-    if(cache==0){
-        HINSTANCE lb=LoadLibrary(L"EDNA2_BUZZER");
-        cache=lb?2:1;
-        switch(cache){
-            case 1:
-                OutputDebugString(L"ResetKit: 1st generation detected.");
-                break;
-            case 2:
-                OutputDebugString(L"ResetKit: 2nd generation detected.");
-                break;
-        }
-    }
-    return cache;
+	static std::wifstream iVersion;
+	static std::wstring line, model;
+	static std::wregex modelRe(L"[A-Z]{2}-[A-Z0-9]+");
+	static std::wsmatch match;
+
+	iVersion.open("\\NAND\\version.txt");
+	while (getline(iVersion, line))
+	{
+		if (regex_search(line, match, modelRe))
+		{
+			model = match[0].str();
+			break;
+		}
+	}
+
+	if (model.length() == 0)
+	{
+		OutputDebugString(L"ResetKit: failed to match the model name");
+		MessageBox(NULL, L"Failed to match the model name", L"ResetKit", MB_ICONWARNING);
+		return 0;
+	}
+
+	OutputDebugString(L"ResetKit: internal model name");
+	OutputDebugString(model.c_str());
+
+	auto iter = models.find(model);
+	if (iter != models.end())
+	{
+		return iter->second;
+	}
+
+	OutputDebugString(L"ResetKit: internal model name is unknown");
+	OutputDebugString(model.c_str());
+	MessageBox(NULL, L"Unknown internal model name", L"ResetKit", MB_ICONWARNING);
+	return 0;
 }
 
 static bool canSoftReset(){
