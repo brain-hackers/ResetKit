@@ -1,0 +1,72 @@
+name: Build
+
+on:
+  push:
+    branches: 'ci*'
+    tags: '*'
+
+jobs:
+  create_release:
+    name: Create release
+    runs-on: ubuntu-latest
+    outputs:
+      upload_url: ${{ steps.create_release.outputs.upload_url }}
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+          submodules: false
+      - name: Generate release name
+        id: release_name
+        # https://github.community/t/how-to-get-just-the-tag-name/16241/4
+        run: echo "name=${GITHUB_REF/refs\/*s\//}" >> $GITHUB_OUTPUT
+      - name: Create release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ steps.release_name.outputs.name }}
+          release_name: ${{ steps.release_name.outputs.name }}
+          body: ''
+          draft: false
+          prerelease: true
+
+  build:
+    name: Build
+    runs-on: ubuntu-20.04
+    needs: [create_release]
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          submodules: true
+      - name: Make /opt writable
+        run: sudo chown "$(whoami):$(whoami)" /opt
+      - name: Install cegcc
+        run: |
+          wget -O cegcc.zip https://github.com/brain-hackers/cegcc-build/releases/download/2022-10-26-225811/cegcc-x86_64-2022-10-26-225811.zip
+          unzip -q cegcc.zip
+          cp -r cegcc /opt/
+      - name: Build ResetKit
+        env:
+          PREFIX: /opt/cegcc
+        run: make
+      - name: Setup releases
+        id: release_name
+        run: |
+          mkdir ResetKit
+          cp *.dll ResetKit/
+          cp *.exe ResetKit/
+          zip -r resetkit.zip ResetKit
+      - name: Generate archive name
+        id: archive_name
+        run: echo "name=ResetKit-${GITHUB_REF/refs\/*s\//}" >> $GITHUB_OUTPUT
+      - name: Upload resetkit.zip
+        uses: actions/upload-release-asset@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          upload_url: ${{ needs.create_release.outputs.upload_url }}
+          asset_path: resetkit.zip
+          asset_name: ${{ steps.archive_name.outputs.name }}.zip
+          asset_content_type: application/zip
