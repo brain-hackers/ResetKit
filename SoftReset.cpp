@@ -41,7 +41,7 @@ static void showAlertWarning(LPCWSTR message,
     
     
     
-    SendMessage(selectorMainWindow, WM_COPYDATA, NULL,
+    SendMessage(selectorMainWindow, WM_COPYDATA, (WPARAM)NULL,
                 (LPARAM)&info);
     
     GlobalFree(global);

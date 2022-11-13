@@ -41,7 +41,7 @@ static void showAlertWarning(LPCWSTR message,
     
     
     
-    SendMessage(selectorMainWindow, WM_COPYDATA, NULL,
+    SendMessage(selectorMainWindow, WM_COPYDATA, (WPARAM)NULL,
                 (LPARAM)&info);
     
     GlobalFree(global);
@@ -78,7 +78,7 @@ static void getThisPath(LPWSTR buffer){
 }
 
 
-static bool installThis(){
+static void installThis(){
 	wchar_t fn[512];
 	
 	OutputDebugString(L"StartDicProtect: installing ResetKit...");

@@ -76,42 +76,6 @@ static bool isDriverLoaded(){
     return false;
 }
 
-static bool addDriverToRegistry(){
-	HKEY hKey;
-	DWORD dw;
-	RegCreateKeyEx(HKEY_LOCAL_MACHINE, (L"Drivers\\BuiltIn\\ResetKitHelper"), 0, NULL, REG_OPTION_NON_VOLATILE, 0, NULL, &hKey, &dw);
-	if(!hKey)
-		return false;
-	
-	dw = 0x0000;
-	if(RegSetValueEx(hKey, (L"Index"), 0, REG_DWORD, (BYTE*)&dw, sizeof(DWORD)) != ERROR_SUCCESS)
-	{
-		RegCloseKey(hKey);
-		return false;
-	}
-	
-	dw = 0x0100;
-	if(RegSetValueEx(hKey, (L"Order"), 0, REG_DWORD, (BYTE*)&dw, sizeof(DWORD)) != ERROR_SUCCESS)
-	{
-		RegCloseKey(hKey);
-		return false;
-	}
-	
-	if(RegSetValueEx(hKey, (L"Dll"), 0, REG_SZ, (BYTE*)(L"\\Windows\\ResetKitHelper.dll"), sizeof(TCHAR) * ((DWORD)wcslen((L"\\Windows\\ResetKitHelper.dll")) + 1)) != ERROR_SUCCESS)
-	{
-		RegCloseKey(hKey);
-		return false;
-	}
-	
-	if(RegSetValueEx(hKey, (L"Prefix"), 0, REG_SZ, (BYTE*)(L"RKH"), sizeof(TCHAR) * ((DWORD)wcslen((L"RKH")) + 1)) != ERROR_SUCCESS)
-	{
-		RegCloseKey(hKey);
-		return false;
-	}
-	
-	return true;
-}
-
 static void loadDriverIfNeeded(){
     if(isDriverLoaded())
         return;

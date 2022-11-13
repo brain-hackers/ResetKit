@@ -96,34 +96,12 @@ static bool doSoftReset();
 static bool g_isDicProtectInstalled=false;
 static bool g_dicProtecUserspaceRequested=false;
 
-#pragma mark - Utils
-
 static void disableInterrupts(){
     asm volatile("mrs	r0, cpsr\n"
         "orr	r0,r0,#0x80\n"
         "msr	cpsr_c,r0\n"
         "mov	r0,#1":::"r0");
 }
-
-static void clearCache(){
-	asm volatile("mcr p15, 0, r0, c7, c7, 0":::"r0");
-}
-
-static void whiteoutBitmap(uint16_t *bitmap, size_t pixels){
-	while(pixels--){
-		unsigned int value=*bitmap;
-		
-		value&=0xf7deU;
-		value>>=1;
-		value+=0x4208U;
-		
-		*bitmap=value;
-		
-		bitmap++;
-	}
-}
-
-#pragma mark - EDNA2 Specific
 
 // only for 0x80000000 - 0x80100000
 #define EDNA2Register(addr) (*(volatile uint32_t *)((addr)+0x30000000))
@@ -387,62 +365,6 @@ static void EDNA2_installDicProtectTimer(){
 }
 
 
-static void EDNA2_fiqHighLevelHandler(){
-	static unsigned int count=0;
-	
-	if(isBatteryCoverOpen()){
-		count++;
-	}else{
-		count=0;
-	}
-	
-	if(count==10 || g_dicProtecUserspaceRequested){
-		
-		// stop interrupt
-		HW_ICOLL_INTERRUPTS51=0;
-		
-		while(true)
-			doSoftReset();
-	}
-	
-}
-
-static uint32_t EDNA2_fiqLowLevelHandler(){
-	asm volatile("sub lr, lr, #4\n"
-				 "ldr sp, [pc, #76]\n"
-				 "stmfd   sp!, {r0-r3, r12, lr}\n"
-				 
-				 
-				 
-				 "mov r8, #0xb0000000\n" /* ldr r8, =0xb00680e0 */
-				 "orr r8, r8, #0x68000\n"
-				 "orr r8, r8, #0xe0\n"
-				 
-				 "mov r9, #0x8000\n"
-				 "str r9, [r8, #8]\n"
-				 
-				 // report that we start ISR!
-				 "mov r8, #0xb0000000\n" // ldr r8, =0xb0000000
-				 "ldr r9, [r8]\n"
-				 "orr r10, r8, #0x10\n"
-				 
-				 "ldr r8, [pc, #32] \n"
-				 "mov lr, pc \n"
-				 "bx r8 \n"
-				 
-				 "mrs	r8, cpsr \n" // enable irq/fiq
-				 "bic	r8,r8,#0xc0 \n"
-				 "msr	cpsr_c,r8 \n"
-				 
-				 "mov r8, #0x8\n"
-				 "str r8, [r10]\n"
-				 
-				 "ldmfd   sp!, {r0-r3, r12, pc}^\n"
-				 "nop\n"
-				 ".word 0xdeadbeef\n" /* write address to EDNA2_fiqHighLevelHandler here */
-				 ".word 0xdeadbeef\n" /* write address to stack here */);
-	return 0xdeadbeef;
-}
 /*
 static uint8_t handlerStack[16384];
 
@@ -615,8 +537,6 @@ static void installDicProtect(){
 
 extern "C" RESETKITHELPER_API BOOL RKH_IOControl(DWORD handle, DWORD dwIoControlCode, DWORD *pInBuf, DWORD nInBufSize, DWORD * pOutBuf, DWORD nOutBufSize, 
                                            PDWORD pBytesReturned){
-	static CEDEVICE_POWER_STATE CurDx;
-	static bool oldRunning=true;
     SetLastError(0);
     
     switch(dwIoControlCode){
