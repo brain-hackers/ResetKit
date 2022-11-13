@@ -1,0 +1,25 @@
+// This file is in public domain.
+
+VS_VERSION_INFO VERSIONINFO
+FILEVERSION 0, 2, 0, 0
+PRODUCTVERSION 0, 2, 0, 0
+FILEOS 4
+FILETYPE 3
+BEGIN
+  BLOCK "StringFileInfo"
+  BEGIN
+    BLOCK "040904E4"
+    BEGIN
+      VALUE "CompanyName",      "Neur0k.info\000"
+      VALUE "FileDescription",  "ResetKitHelper\000"
+      VALUE "FileVersion",      "0.2.0\000"
+      VALUE "InternalName",     "ResetKitHelper\000"
+      VALUE "OriginalFilename", "ResetKitHelper.dll\000"
+      VALUE "LegalCopyright",   "Copyright (c) 2012 T. Kawada\000"
+      VALUE "LegalTrademarks",  "T.Kawada is Tomoaki Kawada.\000"
+      VALUE "ProductName",      "ResetKit\000"
+      VALUE "ProductVersion",   "0.2.0\000"
+      VALUE "Comments",         "Soft/hard reset the electronic dictionary.\000"
+    END
+  END
+END
