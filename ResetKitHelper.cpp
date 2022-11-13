@@ -459,6 +459,7 @@ static bool canHardReset(){
     if(cache==-1){
         switch (deviceGeneration()) {
             case 2:
+            case 3:
                 cache=1;
                 break;
             default:
@@ -479,6 +480,7 @@ static bool doSoftReset(){
     OutputDebugString(L"ResetKit: performing soft reset.");
     switch(deviceGeneration()){
         case 2:
+        case 3:
             if(!EDNA2_disableCleanBoot())
                 return false;
 			//EDNA2_whiteoutScreen();
@@ -495,6 +497,7 @@ static bool doHardReset(){
     OutputDebugString(L"ResetKit: performing hard reset.");
     switch(deviceGeneration()){
         case 2:
+        case 3:
 			EDNA2_dimScreen();
             EDNA2_resetMPU();
             return true;
