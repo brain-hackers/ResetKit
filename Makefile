@@ -1,12 +1,12 @@
 
-CC=/opt/mingw32ce/bin/arm-mingw32ce-gcc
-CXX=/opt/mingw32ce/bin/arm-mingw32ce-g++
-LD=/opt/mingw32ce/bin/arm-mingw32ce-g++
-STRIP=/opt/mingw32ce/bin/arm-mingw32ce-strip
-DLLTOOL=/opt/mingw32ce/bin/arm-mingw32ce-dlltool
-AS=/opt/mingw32ce/bin/arm-mingw32ce-as
-NM=/opt/mingw32ce/bin/arm-mingw32ce-nm
-WINDRES=/opt/mingw32ce/bin/arm-mingw32ce-windres
+CC=/opt/cegcc/bin/arm-mingw32ce-gcc
+CXX=/opt/cegcc/bin/arm-mingw32ce-g++
+LD=/opt/cegcc/bin/arm-mingw32ce-g++
+STRIP=/opt/cegcc/bin/arm-mingw32ce-strip
+DLLTOOL=/opt/cegcc/bin/arm-mingw32ce-dlltool
+AS=/opt/cegcc/bin/arm-mingw32ce-as
+NM=/opt/cegcc/bin/arm-mingw32ce-nm
+WINDRES=/opt/cegcc/bin/arm-mingw32ce-windres
 
 OUTPUT=ResetKit.dll ResetKitHelper.dll SoftReset.exe HardReset.exe StartDicProtect.exe
 
