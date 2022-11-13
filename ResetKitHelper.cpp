@@ -437,6 +437,7 @@ static bool canSoftReset(){
     if(cache==-1){
         switch (deviceGeneration()) {
             case 2:
+            case 3:
                 cache=1;
                 if(!EDNA2_findNKForceCleanBoot())
                     cache=0;
