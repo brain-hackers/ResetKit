@@ -1,5 +1,3 @@
-// This file is in public domain.
-
 #include <windows.h>
 #include <vector>
 #include <algorithm>
