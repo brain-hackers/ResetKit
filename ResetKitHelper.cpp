@@ -412,6 +412,14 @@ static int deviceGeneration(){
 
 	if (model.length() == 0)
 	{
+		// During the reset by DicProtect, regex match may fail.
+		// Fallback to the old 2nd gen detection method to workaround the issue.
+
+		HINSTANCE lb = LoadLibrary(L"EDNA2_BUZZER");
+		if (lb) {
+			return 2;
+		}
+
 		OutputDebugString(L"ResetKit: failed to match the model name");
 		MessageBox(NULL, L"Failed to match the model name", L"ResetKit", MB_ICONWARNING);
 		return 0;
