@@ -26,7 +26,7 @@ DRVFLAGS= -DEV_PLATFORM_WIN32 -DUNICODE -D_UNICODE -DEV_UNSAFE_SWPRINTF -mwin32 
  -Wl,--image-base,0x100000,--allow-multiple-definition \
  -lcoredll -shared
 
-.PHONY:		all clean
+.PHONY:		all clean format
 
 all:				$(OUTPUT)
 
@@ -56,3 +56,5 @@ StartDicProtect.exe:	StartDicProtect.cpp
 				$(CXX) StartDicProtect.cpp -o StartDicProtect.exe $(CXXFLAGS)
 				$(STRIP) StartDicProtect.exe
 
+format:
+	clang-format -i --style=file *.cpp *.h
